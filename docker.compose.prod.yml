@@ -1,0 +1,53 @@
+echo "=== Creation du fichier docker-compose.prod.yml ==="
+cat > docker-compose.prod.yml << 'EOF'
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: backend-postgres
+    environment:
+      POSTGRES_DB: dbdit
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d dbdit"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: moustapha1993/backend-gestion-employe:latest
+    container_name: backend-gestion-employe
+    environment:
+      DATABASE_URL: postgresql://admin:admin123@db:5432/dbdit
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: moustapha1993/frontend-gestion-employe:latest
+    container_name: frontend-gestion-employe
+    environment:
+      REACT_APP_API_URL: http://localhost:8000/api/employes
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+EOF
+
+echo "=== Recuperation des dernieres images ==="
+docker compose -f docker-compose.prod.yml pull
+
+echo "=== Redemarrage des services ==="
+docker compose -f docker-compose.prod.yml up -d
+
+echo "=== Deploiement termine ==="
+docker compose -f docker-compose.prod.yml ps
