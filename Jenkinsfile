@@ -27,8 +27,22 @@ pipeline {
         stage('Smoke test') {
             steps {
                 sh '''
-                    curl -fsS http://host.docker.internal/ > /dev/null
-                    curl -fsS http://host.docker.internal/api/employes > /dev/null
+                    wait_for_url() {
+                        url="$1"
+                        attempt=0
+                        while [ "$attempt" -lt 30 ]; do
+                            if curl -fsS "$url" > /dev/null; then
+                                return 0
+                            fi
+                            attempt=$((attempt + 1))
+                            sleep 2
+                        done
+                        echo "Timed out waiting for $url" >&2
+                        return 1
+                    }
+
+                    wait_for_url http://host.docker.internal/
+                    wait_for_url http://host.docker.internal/api/employes
                 '''
             }
         }
