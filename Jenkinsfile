@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        COMPOSE_PROJECT_NAME = 'tp1'
+        COMPOSE_PROJECT_NAME = 'gestion-employe-ci'
     }
 
     stages {
