@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        COMPOSE_PROJECT_NAME = 'gestion-employe-ci'
+        COMPOSE_PROJECT_NAME = 'gestion-employe'
     }
 
     stages {
@@ -27,8 +27,8 @@ pipeline {
         stage('Smoke test') {
             steps {
                 sh '''
-                    curl -fsS http://localhost:3000 > /dev/null
-                    curl -fsS http://localhost:8000/docs > /dev/null
+                    curl -fsS http://host.docker.internal/ > /dev/null
+                    curl -fsS http://host.docker.internal/api/employes > /dev/null
                 '''
             }
         }

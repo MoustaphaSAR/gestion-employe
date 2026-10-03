@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: backend-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: dbdit
       POSTGRES_USER: admin
@@ -18,7 +18,7 @@ services:
 
   backend:
     image: moustapha1993/backend-gestion-employe:latest
-    container_name: backend-gestion-employe
+    restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://admin:admin123@db:5432/dbdit
     depends_on:
@@ -28,7 +28,7 @@ services:
 
   frontend:
     image: moustapha1993/frontend-gestion-employe:latest
-    container_name: frontend-gestion-employe
+    restart: unless-stopped
     environment:
       # URL RELATIVE : fonctionne quelle que soit l'adresse finale (IP, domaine...)
       REACT_APP_API_URL: /api/employes
@@ -38,7 +38,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: gestion-employe-proxy
+    restart: unless-stopped
     ports:
       - "80:80"   # Seul point d'entrée exposé sur le serveur
     volumes:
